@@ -58,5 +58,25 @@ export const reviewsSeed = [
     createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5,
     image: "/assets/Butter.jpg",
     helpfulCount: 0,
+    replies: [
+      {
+        id: "rep1",
+        text: "Thanks Arjun! Thrilled to hear it's a hit with the kids too. 🥜✨",
+        author: "Maska Team",
+        createdAt: Date.now() - 1000 * 60 * 60 * 24 * 1,
+      },
+      {
+        id: "rep2",
+        text: "Can verify! My kids love it too.",
+        author: "Sarah J.",
+        createdAt: Date.now() - 1000 * 60 * 60 * 12,
+      },
+      {
+        id: "rep3",
+        text: "Is it really not that spicy? I can't handle spice.",
+        author: "Mike T.",
+        createdAt: Date.now() - 1000 * 60 * 60 * 2,
+      }
+    ]
   },
 ];

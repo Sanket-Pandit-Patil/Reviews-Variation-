@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { formatTimeAgo, formatFullDate } from "../utils/timeUtils.js";
 import StarRating from "./StarRating.jsx";
 import ImageLightbox from "./ImageLightbox.jsx";
@@ -20,6 +20,7 @@ export default function ReviewsFeed({
   // Optional filter
   showImageOnlyToggle = false,
   showControls = true,
+  onAddReply = null
 }) {
   // LIST MODE state
   const [visibleCount, setVisibleCount] = useState(initialCount);
@@ -159,6 +160,27 @@ export default function ReviewsFeed({
 
   const hasFilters = searchQuery || ratingFilter > 0 || verifiedOnly || (showImageOnlyToggle && imageOnly);
 
+  const [expandedReplies, setExpandedReplies] = useState({});
+
+  const toggleReplies = (reviewId) => {
+    setExpandedReplies((prev) => ({
+      ...prev,
+      [reviewId]: !prev[reviewId],
+    }));
+  };
+
+  const [replyInputOpen, setReplyInputOpen] = useState(null); // reviewId being replied to
+  const [replyText, setReplyText] = useState("");
+
+  const handleReplySubmit = (reviewId) => {
+    if (!replyText.trim()) return;
+    if (onAddReply) {
+      onAddReply(reviewId, replyText);
+      setReplyInputOpen(null);
+      setReplyText("");
+    }
+  };
+
   return (
     <div className="reviews-feed">
       {showControls && (
@@ -195,7 +217,7 @@ export default function ReviewsFeed({
                 className={`btn btn--secondary ${imageOnly ? "is-active" : ""}`}
                 onClick={() => setImageOnly((v) => !v)}
               >
-                {imageOnly ? "✓ Images only" : "Images only"}
+                {imageOnly ? "âœ“ Images only" : "Images only"}
               </button>
             )}
 
@@ -204,7 +226,7 @@ export default function ReviewsFeed({
               className={`btn btn--secondary ${verifiedOnly ? "is-active" : ""}`}
               onClick={() => setVerifiedOnly((v) => !v)}
             >
-              {verifiedOnly ? "✓ Verified only" : "Verified only"}
+              {verifiedOnly ? "âœ“ Verified only" : "Verified only"}
             </button>
 
             <select
@@ -283,20 +305,21 @@ export default function ReviewsFeed({
                 <div className="ugc__body">
                   <p className="ugc__headline">
                     "{r.text.slice(0, 42)}
-                    {r.text.length > 42 ? "…" : ""}"
+                    {r.text.length > 42 ? "â€¦" : ""}"
                   </p>
                   <ReviewText text={r.text} maxLength={150} />
 
                   <div className="ugc__meta">
                     <StarRating rating={r.rating} size="small" showNumber={true} />
                     <span className="by">
-                      — {r.name}
-                      {r.verified && <span className="verified-badge">✓ Verified</span>}
+                      â€” {r.name}
+                      {r.verified && <span className="verified-badge">âœ“ Verified</span>}
                     </span>
                     <span className="ugc__time" title={formatFullDate(r.createdAt)}>
                       {formatTimeAgo(r.createdAt)}
                     </span>
                   </div>
+
 
                   <div className="ugc__actions">
                     <button
@@ -305,8 +328,26 @@ export default function ReviewsFeed({
                       onClick={() => toggleHelpful(r.id)}
                       aria-label={`Mark review as ${helpfulReviews[r.id] ? "not " : ""}helpful`}
                     >
-                      {helpfulReviews[r.id] ? "✓" : ""} Helpful
+                      {helpfulReviews[r.id] ? "âœ“" : ""} Helpful
                     </button>
+
+
+                    {/* Reply Input Form */}
+                    {replyInputOpen === r.id && (
+                      <div className="reply-input">
+                        <textarea
+                          className="field__input field__textarea"
+                          rows="2"
+                          placeholder="Write a reply..."
+                          value={replyText}
+                          onChange={e => setReplyText(e.target.value)}
+                        />
+                        <div className="reply-actions">
+                          <button className="btn btn--primary btn--small" onClick={() => handleReplySubmit(r.id)}>Post Reply</button>
+                          <button className="btn btn--ghost btn--small" onClick={() => setReplyInputOpen(null)}>Cancel</button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </article>
@@ -357,7 +398,7 @@ export default function ReviewsFeed({
                     <div className="comment__meta">
                       <span className="comment__author">
                         <b>{r.name}</b>
-                        {r.verified && <span className="verified-badge">✓ Verified</span>}
+                        {r.verified && <span className="verified-badge">âœ“ Verified</span>}
                       </span>
                       <span className="comment__time" title={formatFullDate(r.createdAt)}>
                         {formatTimeAgo(r.createdAt)}
@@ -378,6 +419,37 @@ export default function ReviewsFeed({
                     </div>
                   )}
 
+                  {/* Threaded Replies Block */}
+                  {r.replies && r.replies.length > 0 && (
+                    <div className="reply-thread">
+                      {/* Show first reply (or all if expanded) */}
+                      {(expandedReplies[r.id] ? r.replies : r.replies.slice(0, 1)).map((reply) => (
+                        <div key={reply.id} className="reply-block">
+                          <div className="reply-header">
+                            <span className="reply-author">{reply.author}</span>
+                            {reply.author === "Maska Team" && <span className="reply-badge">Brand</span>}
+                            <span className="reply-time muted" style={{ fontSize: 11, marginLeft: 'auto' }}>
+                              {formatTimeAgo(reply.createdAt)}
+                            </span>
+                          </div>
+                          <p className="reply-text">{reply.text}</p>
+                        </div>
+                      ))}
+
+                      {/* Toggle Button */}
+                      {r.replies.length > 1 && (
+                        <button
+                          className="btn-link-reply"
+                          onClick={() => toggleReplies(r.id)}
+                        >
+                          {expandedReplies[r.id]
+                            ? "Hide replies"
+                            : `View ${r.replies.length - 1} more repl${r.replies.length - 1 === 1 ? 'y' : 'ies'}`}
+                        </button>
+                      )}
+                    </div>
+                  )}
+
                   <div className="comment__actions">
                     <button
                       type="button"
@@ -385,9 +457,23 @@ export default function ReviewsFeed({
                       onClick={() => toggleHelpful(r.id)}
                       aria-label={`Mark review as ${helpfulReviews[r.id] ? "not " : ""}helpful`}
                     >
-                      {helpfulReviews[r.id] ? "✓" : ""} Helpful
+                      {helpfulReviews[r.id] ? "âœ“" : ""} Helpful
                     </button>
+                    {onAddReply && (
+                      <button
+                        type="button"
+                        className="btn btn--ghost btn--small"
+                        onClick={() => {
+                          setReplyInputOpen(r.id);
+                          setReplyText("");
+                        }}
+                      >
+                        Reply
+                      </button>
+                    )}
                   </div>
+
+
                 </div>
               ))}
             </div>
@@ -417,7 +503,7 @@ export default function ReviewsFeed({
             )}
 
             {!canShowMore && !canShowLess && (
-              <span className="muted">You’re all caught up.</span>
+              <span className="muted">Youâ€™re all caught up.</span>
             )}
           </div>
         </>

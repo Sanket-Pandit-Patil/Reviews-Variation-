@@ -58,9 +58,10 @@ export default function ReviewModal({ review, onClose }) {
 
         <div className="review-modal__body">
           <ReviewText text={review.text} maxLength={500} />
+
+
         </div>
       </div>
     </div>
   );
 }
-

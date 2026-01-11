@@ -19,6 +19,27 @@ export default function ReviewsSwitch() {
     setReviews((prev) => [r, ...prev]);
   }
 
+  function addReply(reviewId, replyText) {
+    setReviews((prev) =>
+      prev.map((r) =>
+        r.id === reviewId
+          ? {
+            ...r,
+            replies: [
+              ...(r.replies || []),
+              {
+                id: `reply-${Date.now()}`,
+                text: replyText,
+                author: "User", // Generic author for now
+                createdAt: Date.now(),
+              },
+            ],
+          }
+          : r
+      )
+    );
+  }
+
   const items = useMemo(
     () => [
       { key: "A", label: "Variation A · Ticker", desc: "Minimal + fast social proof" },
@@ -54,10 +75,10 @@ export default function ReviewsSwitch() {
         </div>
 
         <div className="tab-panel" role="tabpanel">
-          {active === "A" && <ReviewsTicker reviews={reviews} onAddReview={addReview} />}
-          {active === "B" && <ReviewsMedia reviews={reviews} onAddReview={addReview} />}
-          {active === "C" && <ReviewsData reviews={reviews} onAddReview={addReview} />}
-          {active === "D" && <ReviewsCarousel reviews={reviews} onAddReview={addReview} />}
+          {active === "A" && <ReviewsTicker reviews={reviews} onAddReview={addReview} onAddReply={addReply} />}
+          {active === "B" && <ReviewsMedia reviews={reviews} onAddReview={addReview} onAddReply={addReply} />}
+          {active === "C" && <ReviewsData reviews={reviews} onAddReview={addReview} onAddReply={addReply} />}
+          {active === "D" && <ReviewsCarousel reviews={reviews} onAddReview={addReview} onAddReply={addReply} />}
         </div>
       </div>
     </section>

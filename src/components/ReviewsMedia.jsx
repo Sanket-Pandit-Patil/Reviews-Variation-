@@ -4,7 +4,7 @@ import ReviewsFeed from "./ReviewsFeed.jsx";
 import StarRating from "./StarRating.jsx";
 import { useCountUpOnView } from "../hooks/useCountUpOnView.js";
 
-export default function ReviewsMedia({ reviews, onAddReview }) {
+export default function ReviewsMedia({ reviews, onAddReview, onAddReply }) {
   const stats = useMemo(() => {
     if (reviews.length === 0) {
       return {
@@ -73,13 +73,14 @@ export default function ReviewsMedia({ reviews, onAddReview }) {
         <ReviewForm onAdd={onAddReview} />
 
         <ReviewsFeed
-         reviews={reviews}
-         mode="media"
-         pagination={true}
-         pageSize={3}
-         showImageOnlyToggle={true}
-         showControls={true}
-       />
+          reviews={reviews}
+          mode="media"
+          pagination={true}
+          pageSize={3}
+          showImageOnlyToggle={true}
+          showControls={true}
+          onAddReply={onAddReply}
+        />
 
       </div>
     </section>

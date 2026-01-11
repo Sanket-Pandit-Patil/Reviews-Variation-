@@ -147,6 +147,8 @@ export default function ReviewsCarousel({ reviews, onAddReview }) {
                         <strong>{currentReview.name}</strong>
                         <span className="muted"> • {formatTimeAgo(currentReview.createdAt)}</span>
                       </div>
+
+
                     </div>
                   </div>
                 )}

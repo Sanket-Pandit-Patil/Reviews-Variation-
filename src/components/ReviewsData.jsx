@@ -3,7 +3,7 @@ import ReviewsFeed from "./ReviewsFeed.jsx";
 import ReviewSummary from "./ReviewSummary.jsx";
 import { useCountUpOnView } from "../hooks/useCountUpOnView.js";
 
-export default function ReviewsData({ reviews, onAddReview }) {
+export default function ReviewsData({ reviews, onAddReview, onAddReply }) {
   const avgRating = reviews.length
     ? reviews.reduce((s, r) => s + Number(r.rating || 0), 0) / reviews.length
     : 4.8;
@@ -61,13 +61,14 @@ export default function ReviewsData({ reviews, onAddReview }) {
           <div className="panel panel--glass">
             <ReviewForm onAdd={onAddReview} />
             <div style={{ height: 14 }} />
-            <ReviewsFeed 
-              reviews={reviews} 
-              mode="list" 
-              initialCount={3} 
-              step={3} 
+            <ReviewsFeed
+              reviews={reviews}
+              mode="list"
+              initialCount={3}
+              step={3}
               animated={false}
               showControls={true}
+              onAddReply={onAddReply}
             />
           </div>
         </div>
