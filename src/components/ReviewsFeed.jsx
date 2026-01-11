@@ -473,6 +473,23 @@ export default function ReviewsFeed({
                     )}
                   </div>
 
+                  {/* Reply Input Form */}
+                  {replyInputOpen === r.id && (
+                    <div className="reply-input">
+                      <textarea
+                        className="field__input field__textarea"
+                        rows="2"
+                        placeholder="Write a reply..."
+                        value={replyText}
+                        onChange={e => setReplyText(e.target.value)}
+                      />
+                      <div className="reply-actions">
+                        <button className="btn btn--primary btn--small" onClick={() => handleReplySubmit(r.id)}>Post Reply</button>
+                        <button className="btn btn--ghost btn--small" onClick={() => setReplyInputOpen(null)}>Cancel</button>
+                      </div>
+                    </div>
+                  )}
+
 
                 </div>
               ))}
